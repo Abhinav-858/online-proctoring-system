@@ -7,8 +7,9 @@ import {
 } from 'lucide-react';
 import AnomalyDetector, { RISK_LEVELS } from '../services/AnomalyDetector';
 import { SYNTHETIC_BENCHMARK_SESSIONS } from '../data/syntheticDataset';
-import { QUESTIONS } from '../data/questions';
+import { QUESTIONS, loadQuestionBank } from '../data/questions';
 import { EVENT_TYPES, SEVERITY } from '../services/ActivityLogger';
+import QuestionBankManager from './QuestionBankManager';
 
 const SESSIONS_STORAGE_KEY = 'safeexam_sessions';
 
@@ -117,6 +118,10 @@ export default function ProctorDashboard({ sessionData, currentUser, onStartLive
   // New Session Modal state
   const [showNewSessionModal, setShowNewSessionModal] = useState(false);
   const [modalTab, setModalTab] = useState('simulate');
+  
+  // Question Bank Manager state
+  const [showQuestionBank, setShowQuestionBank] = useState(false);
+  const [activeQuestions, setActiveQuestions] = useState(() => loadQuestionBank());
   
   // Simulation Form State
   const [simCandidateName, setSimCandidateName] = useState('Vikas Varma');
@@ -436,8 +441,20 @@ export default function ProctorDashboard({ sessionData, currentUser, onStartLive
             <PlusCircle size={16} />
             New Exam Session
           </button>
+          <button onClick={() => setShowQuestionBank(true)} className="btn btn-secondary" style={{ backgroundColor: 'rgba(245,158,11,0.12)', borderColor: 'rgba(245,158,11,0.3)', color: '#fbbf24' }}>
+            <FileText size={16} />
+            Question Bank ({activeQuestions.length})
+          </button>
         </div>
       </div>
+
+      {/* QUESTION BANK MANAGER MODAL */}
+      {showQuestionBank && (
+        <QuestionBankManager
+          onClose={() => setShowQuestionBank(false)}
+          onSaved={(updated) => setActiveQuestions(updated)}
+        />
+      )}
 
       {/* NEW SESSION MANAGEMENT MODAL */}
       {showNewSessionModal && (
